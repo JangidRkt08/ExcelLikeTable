@@ -47,8 +47,7 @@ export default function ParentComponent() {
   const handleAddRow = () => {
     setTableData([...tableData, Array(headers.length).fill('')]);
   };
-console.log(tableData)
-  // console.log(tableData)
+
   return (
     <>
     <ExcelLikeTable

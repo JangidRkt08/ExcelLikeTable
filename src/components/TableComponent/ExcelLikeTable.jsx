@@ -23,14 +23,59 @@ export default function ExcelLikeTable({
   const [editingCell, setEditingCell] = useState(null);
   const tableRef = useRef(null);
   const cellRefs = useRef({});
-  
+  const [selectedColumnIndices, setSelectedColumnIndices] = useState();
     const updatedArray = headers?.map((header,index) => ({
       label: header,
       value: header,
       index: index,
     }));
+    const [columnWidths, setColumnWidths] = useState(headers.map(() => 150));
+  const resizingColumn = useRef(null);
+  const startX = useRef(null);
+  const resizingSide=useRef(null)
+  
+  const handleMouseDown = (event, index, side) => {
     
- 
+    resizingColumn.current = index;
+    console.log(resizingColumn.current)
+    startX.current = event.clientX;
+    console.log(startX.current)
+    resizingSide.current = side;
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+  
+  const handleMouseMove = (event) => {
+    if (resizingColumn.current !== null) {
+      const diffX = event.clientX - startX.current;
+      startX.current = event.clientX;
+  
+      setColumnWidths((prevWidths) => {
+        const newWidths = [...prevWidths];
+  
+        if (resizingSide.current === 'right') {
+          // Increase width on the right border drag
+          newWidths[resizingColumn.current] = Math.max(50, newWidths[resizingColumn.current] + diffX);
+        } else if (resizingSide.current === 'left') {
+          // Decrease width of current and increase width of the previous column on the left border drag
+          if (resizingColumn.current > 0) {
+            newWidths[resizingColumn.current] = Math.max(50, newWidths[resizingColumn.current] - diffX);
+            newWidths[resizingColumn.current - 1] = Math.max(50, newWidths[resizingColumn.current - 1] + diffX);
+          }
+        }
+  
+        return newWidths;
+      });
+    }
+  };
+  
+  const handleMouseUp = () => {
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+    resizingColumn.current = null;
+    resizingSide.current = null; // Reset the side
+  };
+  
  
   useEffect(() => {
     setLocalData(data.length > 0 ? data : [Array(headers.length).fill('')]);
@@ -82,6 +127,16 @@ export default function ExcelLikeTable({
     setEditingCell(null);
   };
 
+  const handleHeaderClick = (index) => {
+    // if (selectedColumnIndices.includes(index)) {
+    //     setSelectedColumnIndices(selectedColumnIndices.filter(i => i !== index)); 
+    // } else {
+    //     setSelectedColumnIndices([...selectedColumnIndices, index]); 
+    // }
+    setSelectedColumnIndices(index)
+};
+
+
   const handleKeyDown = (e, rowIndex, colIndex) => {
     if (editingCell) {
       if (e.key === 'Enter' && !e.shiftKey) {
@@ -106,7 +161,6 @@ export default function ExcelLikeTable({
           tabKeyDirection==='down'?moveFocus(1,0):tabKeyDirection === 'up'?moveFocus(-1,0):tabKeyDirection === 'left'?moveFocus(0,-1):tabKeyDirection === 'right'?moveFocus(0,1):moveFocus(0,0)
           break;
         case 'ArrowUp':
-          console.log("arrow up")
           e.preventDefault();
           moveFocus(-1, 0);
           break;
@@ -140,7 +194,7 @@ export default function ExcelLikeTable({
     const inputType = inputTypes[headers[colIndex]] || 'text';
     const isEditing = editingCell && editingCell.row === rowIndex && editingCell.col === colIndex;
     const isFocused = focusedCell.row === rowIndex && focusedCell.col === colIndex;
-
+    const isSelected = selectedColumnIndices===colIndex;
     if (isEditing) {
       return (
         <CustomTextArea
@@ -194,7 +248,7 @@ export default function ExcelLikeTable({
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
             outline: isFocused ? '2px solid #007bff' : 'none',
-            backgroundColor: isFocused ? '#e6f2ff' : 'transparent',
+            backgroundColor: isFocused ? '#e6f2ff' :isSelected ? '#d0e0ff' : 'transparent',
           }}
         >
           {value}
@@ -220,11 +274,56 @@ export default function ExcelLikeTable({
 
       <Table ref={tableRef}>
         
-          <TableHead >
-            {visibleHeader.map((header, index) => (
-              <TableCell key={index} style={{ ...styles.header, border: '1px solid #ddd', padding: '8px', whiteSpace: 'normal', wordWrap: 'break-word' }}>{header.header}</TableCell>
-            ))}
-          </TableHead>
+      <TableHead>
+  {visibleHeader.map((header, index) => (
+    <TableCell
+      key={index}
+      style={{
+        ...styles.header,
+        border: '1px solid #ddd',
+        padding: '8px',
+        whiteSpace: 'normal',
+        wordWrap: 'break-word',
+        width: `${columnWidths[index]}px`,
+        position: 'relative', // Make sure this is set for absolute positioning of the border spans
+      }}
+    >
+      {/* Left Border for Resizing */}
+      {index > 0 && (
+        <span
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: '5px',
+            cursor: 'ew-resize',
+          }}
+          onMouseDown={(e) => handleMouseDown(e, index, 'left')}
+        />
+      )}
+
+      {/* Header Content */}
+      <span onClick={() => handleHeaderClick(index)}>
+        {header.header}
+      </span>
+
+      <span
+        style={{
+          position: 'absolute',
+          right: 0,
+          top: 0,
+          bottom: 0,
+          width: '5px',
+          cursor: 'ew-resize', 
+        }}
+        onMouseDown={(e) => handleMouseDown(e, index, 'right')}
+      />
+    </TableCell>
+  ))}
+</TableHead>
+
+
           
        
         <TableBody>
