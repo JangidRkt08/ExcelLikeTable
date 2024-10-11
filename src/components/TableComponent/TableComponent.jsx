@@ -9,8 +9,8 @@ export default function ParentComponent() {
     ['Sarah', 'Williams', '42', 'Sarah has a multi-line address to show how it affects row height'],
   ]);
 
-  const headers = ['First Name', 'Last Name', 'Age', 'Email',"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"];
-
+  const headers = ['First Name', 'Last Name', 'Age', 'Email'];
+  const columnWidth=['100','200','150','800']
   const inputTypes = {
     'First Name': 'text',
     'Last Name': 'text',
@@ -49,7 +49,9 @@ export default function ParentComponent() {
   };
 
   return (
-    <>
+    <div onKeyDown={(e) => {
+      console.log(e.key)      
+    }}>
     <ExcelLikeTable
         headers={headers}
         data={tableData}
@@ -58,6 +60,7 @@ export default function ParentComponent() {
         styles={styles}
         inputTypes={inputTypes}
         title="dynamic table"
+        columnWidth={columnWidth}
         />
-    </>
+    </div>
   )};
