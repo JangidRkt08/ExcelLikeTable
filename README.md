@@ -1,70 +1,145 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Excel-Like Table Component
 
-## Available Scripts
+This project is a React component designed to mimic the functionality of an Excel-like table. It includes dynamic headers, row addition, data handling, and input focus management, with ongoing improvements to enhance user experience and flexibility. Contributions are welcome to resolve existing issues and add new features!
 
-In the project directory, you can run:
 
-### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Table of Contents
 
-### `npm test`
+ - [Installation]()
+ - [Usage]()
+ - [Features]()
+- [Contributing]()
+- [Issue Tracking]()
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Installation
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+To get started with this project, clone the repository and install the required dependencies.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+  git clone https://github.com/adityatyagi-av/ExcelLikeTable
+  cd ExcelLikeTable
+  npm i
+```
 
-### `npm run eject`
+## Usage/Examples
+I have shown the usage in TableComponent.jsx
+```javascript
+import React, { useState } from 'react';
+import ExcelLikeTable from './ExcelLikeTable';
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+export default function ParentComponent() {
+  const [tableData, setTableData] = useState([
+    ['John', 'Doe', '30', 'john@example.com'],
+    ['Jane', 'Smith', '28', 'jane@example.com'],
+    ['Michael', 'Johnson', '35', 'This is a very long email address that will demonstrate text wrapping in the cell michael.johnson@verylongdomainname.com'],
+    ['Sarah', 'Williams', '42', 'Sarah has a multi-line address to show how it affects row height'],
+  ]);
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+  const headers = ['First Name', 'Last Name', 'Age', 'Email'];
+  const columnWidth=['100','200','150','800']
+  const inputTypes = {
+    'First Name': 'text',
+    'Last Name': 'text',
+    'Age': 'number',
+    'Email': 'email',
+  };
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+  const styles = {
+    table: {
+      maxHeight: '400px',
+      overflowY: 'auto',
+      border: '1px solid #ddd',
+      borderCollapse: 'collapse',
+    },
+    header: {
+      backgroundColor: '#f0f0f0',
+      fontWeight: 'bold',
+      border: '1px solid #ddd',
+      padding: '8px',
+    },
+    cell: {
+      padding: '8px',
+      border: '1px solid #ddd',
+    },
+    input: {
+      fontSize: '14px',
+    },
+  };
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+  const handleDataChange = (newData) => {
+    setTableData(newData);
+  };
 
-## Learn More
+  const handleAddRow = () => {
+    setTableData([...tableData, Array(headers.length).fill('')]);
+  };
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+  return (
+    <div onKeyDown={(e) => {
+      console.log(e.key)      
+    }}>
+    <ExcelLikeTable
+        headers={headers}
+        data={tableData}
+        onAddRow={handleAddRow}
+        onDataChange={handleDataChange}
+        styles={styles}
+        inputTypes={inputTypes}
+        title="dynamic table"
+        columnWidth={columnWidth}
+        />
+    </div>
+  )};
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
 
-### Code Splitting
+## Features
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- Dynamic headers
+- Row addition and removal
+- Input focus management
+- Expandable rows based on condition
+- Keyboard navigation and Enter key functionality
 
-### Analyzing the Bundle Size
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Contributing
 
-### Making a Progressive Web App
+Contributions are always welcome!
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Please follow the steps below to contribute to this project:
 
-### Advanced Configuration
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+```bash
+  git checkout -b feature-name
+```
+3. Commit your changes
+```bash
+  git commit -m "Describe your changes"
+```
+4. Push to your branch
+```bash
+  git push origin feature-name
+```
+5. Open a Pull Request describing your changes.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Guidelines
 
-### Deployment
+- Ensure your code follows the project’s code style.
+- Write clear commit messages and comments.
+- Test your changes thoroughly before submitting.
+- For large features, please open an issue first to discuss your idea with the maintainers.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-### `npm run build` fails to minify
+## Issue Tracking
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+We track bugs and feature requests under the Issues section on GitHub. Before starting work on an issue, please check if it's already assigned or being worked on by someone else.
+
+If you encounter a new bug or have a feature request, feel free to open a new issue. Make sure to provide detailed information, including steps to reproduce the problem or a description of the feature you have in mind.
+
+
